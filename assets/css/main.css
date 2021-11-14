@@ -1,0 +1,31 @@
+h1, h2, h3, h4, h5, h6 { font-size: 150% !important; }
+@media only screen and (min-width: 601px) {
+    .container {
+      width: 90%;
+    }
+}
+@media only screen and (min-width: 993px) {
+    .container {
+      width: 90%;
+    }
+}
+.bold-text { font-weight: bold !important; }
+.middled { vertical-align: middle; position: relative; top: -1px; }
+#hidden-div, .hidden, #push { display: none; }
+.items { padding: 4px; font-size: 1.1em; }
+.collapsible-body { padding: 4px !important;}
+hr { border: 0; height: 0; border-top: 1px solid rgba(0, 0, 0, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+strong { font-weight: bold; }
+.poster { max-height: 350px;}
+.padding { display: inline-block; padding: 2px; }
+.collapsible-header-alt {  padding: 0px !important; background-color: transparent !important; border-bottom: none !important; }
+.main-logo { width: auto; height: 50px; padding-top: 10px; }
+ul.custom_breadcrumb { padding: 8px 14px; list-style: none; }
+ul.custom_breadcrumb li { display: inline; }
+ul.custom_breadcrumb li+li:before { padding: 8px; content: "/\00a0"; }
+.no-style-label {
+    transition: none !important;
+    text-align: justify !important;
+    transform: none !important;
+}
+.card .card-content { padding: 10px !important; }

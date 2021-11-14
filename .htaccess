@@ -1,0 +1,188 @@
+
+RewriteEngine on
+# merajbd7@gmail.com
+<IfModule mod_rewrite.c>
+
+# Error Handling
+ErrorDocument 400 /_error.php?error=400
+ErrorDocument 401 /_error.php?error=401
+ErrorDocument 403 /_error.php?error=403
+ErrorDocument 404 /_error.php?error=404
+ErrorDocument 500 /_error.php?error=500 
+
+DirectoryIndex index index.html index.php index.htm default.htm
+
+</IfModule>
+
+# Apache Rewrite Rules
+ <IfModule mod_rewrite.c>
+  Options +FollowSymLinks
+  RewriteEngine On
+  RewriteBase /
+
+# Add trailing slash to url
+  #RewriteCond %{REQUEST_FILENAME} !-f
+  #RewriteCond %{REQUEST_URI} !(\.[a-zA-Z0-9]{1,5}||#(.*))$
+  #RewriteRule ^(.*)$ $1 [R=301,L,QSA,NC]
+
+# Remove .php-extension from url
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}\.php -f
+  RewriteRule ^([^\.]+)$ $1.php [QSA,NC,L]
+
+# rewrite url for movies
+RewriteRule ^latest/page-(.*).php$ /latest.php?p=$1 [L,QSA]
+
+RewriteRule ^movies/?$ /category.php?cat=movies [L,QSA]
+RewriteRule ^tv-series/?$ /category.php?cat=tv-series [L,QSA]
+
+RewriteRule ^tv-series/([a-zA-Z0-9-]+)/?$ sub_category.php?cat=tv-series&sub=$1 [L,QSA,NC]
+RewriteRule ^movies/([a-zA-Z0-9-]+)/?$ sub_category.php?cat=movies&sub=$1 [L,QSA,NC]
+
+RewriteRule ^tv-series/([a-zA-Z0-9-]+)/page-(.*)$ sub_category.php?cat=tv-series&sub=$1&p=$2 [L,QSA,NC]
+RewriteRule ^movies/([a-zA-Z0-9-]+)/page-(.*)$ sub_category.php?cat=movies&sub=$1&p=$2 [L,QSA,NC]
+
+
+RewriteRule ^tv-series/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/?$ post.php?cat=tv-series&sub=$1&post=$2 [L,QSA,NC]
+RewriteRule ^movies/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/?$ post.php?cat=movies&sub=$1&post=$2 [L,QSA,NC]
+
+RewriteRule ^genres/([a-zA-Z-?]+)/page-(.*)$ genre.php?genre=$1&p=$2 [L,QSA,NC]
+RewriteRule ^genres/(.*) /genre.php?genre=$1 [L,QSA]
+
+RewriteRule ^assets/images/posters/(.*)$ /_thumbs.php?id=$1 [L,QSA]
+
+# End of Apache Rewrite Rules
+ </IfModule>
+
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^https://%{HTTP_HOST}%{REQUEST_URI} [QSA,NC,L,R=301]
+
+<FilesMatch "\.(ttf|otf|eot|woff)$">
+  <IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+  </IfModule>
+</FilesMatch>
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|xml|gz)$">
+    Header append Vary: Accept-Encoding
+  </FilesMatch>
+</IfModule>
+
+# use mod_deflate if available
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE text/xml
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE image/x-icon
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE application/rss+xml
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/x-javascript
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE application/xhtml+xml
+  AddOutputFilterByType DEFLATE application/x-font
+  AddOutputFilterByType DEFLATE application/x-font-truetype
+  AddOutputFilterByType DEFLATE application/x-font-ttf
+  AddOutputFilterByType DEFLATE application/x-font-otf
+  AddOutputFilterByType DEFLATE application/x-font-opentype
+  AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+  AddOutputFilterByType DEFLATE font/ttf
+  AddOutputFilterByType DEFLATE font/otf
+  AddOutputFilterByType DEFLATE font/opentype
+    <IfModule mod_setenvif.c>
+        # Netscape 4.x has some problems...
+        BrowserMatch ^Mozilla/4 gzip-only-text/html
+
+        # Netscape 4.06-4.08 have some more problems
+        BrowserMatch ^Mozilla/4\.0[678] no-gzip
+
+        # MSIE masquerades as Netscape, but it is fine
+        BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+
+        # NOTE: Due to a bug in mod_setenvif up to Apache 2.0.48
+        # the above regex won't work. You can use the following
+        # workaround to get the desired effect:
+        BrowserMatch \bMSI[E] !no-gzip !gzip-only-text/html
+
+        # Don't compress images
+        SetEnvIfNoCase Request_URI .(?:gif|jpe?g|png)$ no-gzip dont-vary
+    </IfModule>
+
+    <IfModule mod_headers.c>
+        # Make sure proxies don't deliver the wrong content
+        Header append Vary User-Agent env=!dont-vary
+    </IfModule>
+</IfModule>
+# Cache for speeding up
+<FilesMatch "\.(?i:gif|jpe?g|png|ico|css|js|swf|xml)$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "max-age=608400, public, must-revalidate"
+  </IfModule>
+</FilesMatch>
+<IfModule mod_headers.c>
+Header set Strict-Transport-Security "max-age=604800; includeSubDomains"
+Header set X-Frame-Options "SAMEORIGIN"
+Header set X-Xss-Protection "1; mode=block"
+Header set X-Content-Type-Options "nosniff"
+</IfModule>
+<ifModule mod_gzip.c>
+  mod_gzip_on Yes
+  mod_gzip_dechunk Yes
+  mod_gzip_item_include file \.(html?|txt|css|js|php|pl)$
+  mod_gzip_item_include mime ^application/x-javascript.*
+  mod_gzip_item_include mime ^text/.*
+  mod_gzip_item_exclude rspheader ^Content-Encoding:.*gzip.*
+  mod_gzip_item_exclude mime ^image/.* 
+  mod_gzip_item_include handler ^cgi-script$
+</ifModule>
+## EXPIRES CACHING ##
+<IfModule mod_expires.c>
+ExpiresActive On
+AddType application/vnd.ms-fontobject .eot 
+AddType application/x-font-ttf .ttf
+AddType application/x-font-opentype .otf
+AddType application/x-font-woff .woff
+AddType image/svg+xml .svg
+ExpiresByType application/vnd.ms-fontobject "access 1 year"
+ExpiresByType application/x-font-ttf "access 1 year"
+ExpiresByType application/x-font-opentype "access 1 year"
+ExpiresByType application/x-font-woff "access 1 year"
+ExpiresByType image/svg+xml "access 1 year"
+ExpiresByType text/html "access 1 hour"
+ExpiresByType text/css "access 14 days"
+ExpiresByType text/x-javascript "access 3 weeks"
+ExpiresByType application/javascript "access 1 month"  
+ExpiresByType application/x-javascript "access 1 month"
+ExpiresByType image/gif "access 2 months"
+ExpiresByType image/png "access 2 months"
+ExpiresByType image/jpg "access 2 months"
+ExpiresByType image/jpeg "access 2 months"
+ExpiresByType image/gif "access 2 months"
+ExpiresByType application/pdf "access 1 year"
+ExpiresByType application/x-shockwave-flash "access 1 year"
+ExpiresByType image/x-icon "access 1 year"
+ExpiresDefault "access 2 days"
+</IfModule>
+## EXPIRES CACHING ##
+# BEGIN Cache-Control Headers
+<ifModule mod_headers.c>
+<filesMatch "\.(ico|jpe?g|png|gif|swf)$">
+ Header set Cache-Control "public"
+</filesMatch>
+<filesMatch "\.(css)$">
+ Header set Cache-Control "public"
+</filesMatch>
+<filesMatch "\.(js)$">
+ Header set Cache-Control "private"
+</filesMatch>
+#<filesMatch "\.(x?html?|php|)$">
+#Header set Cache-Control "private, must-revalidate"
+#</filesMatch>
+</ifModule>
+# END Cache-Control Headers
+<ifModule mod_headers.c>
+</ifModule>
+
